@@ -5,14 +5,14 @@ common:
   - etcd-2.etcd-headless.etcd.svc.cluster.local:2379
   catalog_name: test
   # use minio
-  root_dir: s3://flavius/test
+  root_dir: oss://flavius/test
   aws_access_key_id: fvadmin
   aws_secret_access_key: fvadmin123
   aws_endpoint: http://minio:9000
   otlp_http_url: ""
 
 fe:
-  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2836ccb
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2a404ba
   resources:
     requests:
       cpu: 0.1
@@ -23,7 +23,7 @@ fe:
 
 ms:
   replicas: 1
-  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2836ccb
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2a404ba
   resources:
     requests:
       cpu: 0.1
@@ -35,7 +35,7 @@ ms:
 
 cn:
   replicas: 1
-  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2836ccb
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2a404ba
   task:
     task_cleanup_threshold_ms: 3600000
   resources:

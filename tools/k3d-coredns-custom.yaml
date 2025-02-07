@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  minio.server: |
+    flavius.minio {
+        log
+        errors
+        rewrite name flavius.minio minio.minio.svc.cluster.local
+        forward . 127.0.0.1
+    }
+    minio {
+        log
+        errors
+        rewrite name minio minio.minio.svc.cluster.local
+        forward . 127.0.0.1
+    }
+

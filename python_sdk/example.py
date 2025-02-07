@@ -79,16 +79,16 @@ if __name__ == "__main__":
     # import data
     driver.execute_query(
         'BLOCKING IMPORT VERTEX User COLUMNS("col1"=$0, "col2"=$1, "col3"=$2, "col4"=$3, "col5"=$4) '
-        "FROM 's3://flavius/users.csv' WITH (region = 'cn-hongkong', "
-        "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://localhost:30900') "
+        "FROM 'oss://flavius/users.csv' WITH (region = 'cn-hongkong', "
+        "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://minio:9000') "
         "FORMAT AS CSV (has_header = false, delimiter = ',')",
         namespace=ns,
         graph=g,
     )  # Returns None
     driver.execute_query(
         'BLOCKING IMPORT EDGE knows FROM ("col1"=$1) TO ("col1"=$2) COLUMNS("col1"=$0) '
-        "FROM 's3://flavius/knows.csv' WITH (region = 'cn-hongkong', "
-        "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://localhost:30900') "
+        "FROM 'oss://flavius/knows.csv' WITH (region = 'cn-hongkong', "
+        "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://minio:9000') "
         "FORMAT AS CSV (has_header = false, delimiter = ',')",
         namespace=ns,
         graph=g,
