@@ -1,0 +1,57 @@
+common:
+  etcd_endpoints:
+  - etcd-0.etcd-headless.etcd.svc.cluster.local:2379
+  - etcd-1.etcd-headless.etcd.svc.cluster.local:2379
+  - etcd-2.etcd-headless.etcd.svc.cluster.local:2379
+  catalog_name: test
+  # use minio
+  root_dir: s3://flavius/test
+  aws_access_key_id: fvadmin
+  aws_secret_access_key: fvadmin123
+  aws_endpoint: http://minio:9000
+  otlp_http_url: ""
+
+fe:
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2836ccb
+  resources:
+    requests:
+      cpu: 0.1
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 8Gi
+
+ms:
+  replicas: 1
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2836ccb
+  resources:
+    requests:
+      cpu: 0.1
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 8Gi
+
+
+cn:
+  replicas: 1
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2836ccb
+  task:
+    task_cleanup_threshold_ms: 3600000
+  resources:
+    requests:
+      cpu: 0.1
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 8Gi
+    max_query_cpu_threads: 16
+    max_system_cpu_threads: 4
+    max_io_threads: 16
+    # 6GB for query execution memory pool
+    max_memory_pool_bytes: 6442450944
+    data_cache_enabled: true
+    # ssd_cache_max_mb should be adjusted according to the disk capacity & dataset size
+    ssd_cache_max_mb: 1024
+    # ssd_cache_num_shards should be adjusted according to the cpu resource availability
+    ssd_cache_num_shards: 1

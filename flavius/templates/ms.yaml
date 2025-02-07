@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms
+spec:
+  serviceName: ms
+  replicas: {{ .Values.ms.replicas }}
+  selector:
+    matchLabels:
+      app: ms
+  template:
+    metadata:
+      labels:
+        app: ms
+      annotations:
+        k8s.grafana.com/scrape: "true"
+        k8s.grafana.com/metrics.portNumber: "55521"
+        k8s.grafana.com/metrics.path: "/brpc_metrics"
+    spec:
+      containers:
+      - name: main
+        image: {{ .Values.ms.image }}
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 55521
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          sh /Flavius/config/config_gen.sh /Flavius/config/ms.toml.template /Flavius/ms.toml
+          exec /Flavius/MetaService -config=/Flavius/ms.toml -logtostderr
+        env:
+        {{- include "common.env" .| nindent 8}}
+        resources:
+          requests:
+            cpu: {{ .Values.ms.resources.requests.cpu }}
+            memory: {{ .Values.ms.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.ms.resources.limits.cpu }}
+            memory: {{ .Values.ms.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /Flavius/config/ms.toml.template
+          subPath: ms.toml.template
+        - name: config
+          mountPath: /Flavius/config/config_gen.sh
+          subPath: config_gen.sh
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 55521
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+      imagePullSecrets:
+        - name: image-pull-secret
+      volumes:
+      - name: config
+        configMap:
+          name: config
+          items:
+          - key: ms.toml.template
+            path: ms.toml.template
+          - key: config_gen.sh
+            path: config_gen.sh
+
+

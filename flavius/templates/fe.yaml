@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 30000
+    targetPort: 30000
+    nodePort: 30000
+    protocol: TCP
+  selector:
+    app: fe
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fe
+spec:
+  serviceName: fe
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fe
+  template:
+    metadata:
+      labels:
+        app: fe
+      annotations:
+        k8s.grafana.com/scrape: "true"
+        k8s.grafana.com/metrics.portNumber: "30000"
+    spec:
+      containers:
+      - name: main
+        image: {{ .Values.fe.image }}
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 30000
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          sh /Flavius/config/config_gen.sh /Flavius/config/fe.toml.template /Flavius/fe.toml
+          exec /Flavius/frontend/frontend -c /Flavius/fe.toml
+        env:
+        {{- include "common.env" .| nindent 8}}
+        resources:
+          requests:
+            cpu: {{ .Values.fe.resources.requests.cpu }}
+            memory: {{ .Values.fe.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.fe.resources.limits.cpu }}
+            memory: {{ .Values.fe.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /Flavius/config/fe.toml.template
+          subPath: fe.toml.template
+        - name: config
+          mountPath: /Flavius/config/config_gen.sh
+          subPath: config_gen.sh
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 30000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+      imagePullSecrets:
+        - name: image-pull-secret
+      volumes:
+      - name: config
+        configMap:
+          name: config
+          items:
+          - key: fe.toml.template
+            path: fe.toml.template
+          - key: config_gen.sh
+            path: config_gen.sh
+
+

@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  fe.toml.template: |
+    [deploy_mode]
+    deploy_mode = "Cluster"
+
+    [http_service_config]
+    host = "0.0.0.0"
+    port = 30000
+
+    [meta_config.etcd_client]
+    etcd_endpoints = "{{ .Values.common.etcd_endpoints | join "," }}"
+    catalog_name = "{{ .Values.common.catalog_name }}"
+
+
+    ## Tracing options
+    [tracing_config]
+    ## Enable OTLP tracing.
+    enable_otlp_tracing = false
+
+    ## The OTLP tracing endpoint.
+    otlp_endpoint = "{{ .Values.common.otlp_http_url }}"
+
+  ms.toml.template: |
+    server_ip = "POD_IP"
+    server_port = 55521
+    idle_timeout_sec = 100
+    enable_multi_meta_server = true
+    etcd_url = "{{ .Values.common.etcd_endpoints | join "," }}"
+
+    root_dir = "{{ .Values.common.root_dir }}"
+
+    catalog_type = "S3FSCatalog"
+    catalog_metadata_manager_type = "EtcdBased"
+    catalog_name = "{{ .Values.common.catalog_name }}"
+
+    s3_access_key_id = "{{ .Values.common.aws_access_key_id }}"
+    s3_secret_access_key = "{{ .Values.common.aws_secret_access_key }}"
+    s3_region = "{{ .Values.common.aws_region }}"
+    oss_endpoint = "{{ .Values.common.aws_endpoint }}"
+
+    #trace_exporter_url = " {{ .Values.common.otlp_http_url }}"
+    ## True do disable SSL, default false
+    # trace_exporter_ssl_insecure_skip_verify = false
+    ## CLIENT KEY, as a string
+    # trace_exporter_ssl_client_key_string = ""
+    ## CLIENT CERT, as a string
+    # trace_exporter_client_cert_string = ""
+
+  cn.toml.template: |
+    server_ip = "POD_IP"
+    server_port = 55532
+    idle_timeout_sec = 100
+    enable_multi_meta_server = true
+    etcd_url = "{{ .Values.common.etcd_endpoints | join "," }}"
+    catalog_name = "{{ .Values.common.catalog_name }}"
+
+    # for aliyun oss config
+    s3_access_key_id = "{{ .Values.common.aws_access_key_id }}"
+    s3_secret_access_key = "{{ .Values.common.aws_secret_access_key }}"
+    s3_region = "{{ .Values.common.aws_region }}"
+    oss_endpoint = "{{ .Values.common.aws_endpoint }}"
+
+    #[trace]
+    #trace_exporter_url = " {{ .Values.common.otlp_http_url }}"
+    ## True do disable SSL, default false
+    # trace_exporter_ssl_insecure_skip_verify = false
+    ## CLIENT KEY, as a string
+    # trace_exporter_ssl_client_key_string = ""
+    ## CLIENT CERT, as a string
+    # trace_exporter_client_cert_string = ""
+
+    [resource]
+    max_query_cpu_threads =  {{ .Values.cn.resources.max_query_cpu_threads }}
+    max_system_cpu_threads =  {{ .Values.cn.resources.max_system_cpu_threads }}
+    max_io_threads = {{ .Values.cn.resources.max_io_threads }}
+    max_memory_pool_bytes = {{ .Values.cn.resources.max_memory_pool_bytes }}
+    data_cache_enabled = {{ .Values.cn.resources.data_cache_enabled }}
+    ssd_cache_max_mb = {{ .Values.cn.resources.ssd_cache_max_mb }}
+    ssd_cache_num_shards = {{ .Values.cn.resources.ssd_cache_num_shards }}
+
+    [task]
+    task_cleanup_threshold_ms = {{ .Values.cn.task.task_cleanup_threshold_ms }}
+
+  config_gen.sh: |
+    #!/usr/bin/env bash
+
+    set -e
+
+    old_file_path=$1
+    new_file_path=$2
+
+    cp $old_file_path $new_file_path
+
+    escape_sed() {
+        echo "$1" | sed -e 's/[\/&]/\\&/g'
+    }
+
+    sed -i "s/POD_IP/$(escape_sed "$POD_IP")/g" "${new_file_path}"

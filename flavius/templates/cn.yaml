@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cn
+spec:
+  serviceName: cn
+  replicas: {{ .Values.cn.replicas }}
+  selector:
+    matchLabels:
+      app: cn
+  template:
+    metadata:
+      labels:
+        app: cn
+      annotations:
+        k8s.grafana.com/scrape: "true"
+        k8s.grafana.com/metrics.portNumber: "55532"
+        k8s.grafana.com/metrics.path: "/brpc_metrics"
+    spec:
+      containers:
+      - name: main
+        image: {{ .Values.cn.image }}
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 55532
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          sh /Flavius/config/config_gen.sh /Flavius/config/cn.toml.template /Flavius/cn.toml
+          exec /Flavius/FlaviusCN -config=/Flavius/cn.toml -logtostderr
+        env:
+        {{- include "common.env" .| nindent 8}}
+        resources:
+          requests:
+            cpu: {{ .Values.cn.resources.requests.cpu }}
+            memory: {{ .Values.cn.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.cn.resources.limits.cpu }}
+            memory: {{ .Values.cn.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /Flavius/config/cn.toml.template
+          subPath: cn.toml.template
+        - name: config
+          mountPath: /Flavius/config/config_gen.sh
+          subPath: config_gen.sh
+        - name: cache
+          mountPath: /tmp
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 55532
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+      imagePullSecrets:
+        - name: image-pull-secret
+      volumes:
+      - name: config
+        configMap:
+          name: config
+          items:
+          - key: cn.toml.template
+            path: cn.toml.template
+          - key: config_gen.sh
+            path: config_gen.sh
+      - name: cache
+        emptyDir:
+          sizeLimit: 30Gi
