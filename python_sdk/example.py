@@ -1,26 +1,20 @@
+import time
 import dateutil
-from flavius import GraphDatabase, DataType, TimeStamp
-import boto3
+from flavius import Client, DataType, GraphDatabase, TimeStamp
+from minio import Minio
 import os
 
 
 def upload_data():
-    # boto3 is an AWS-SDK for connection of s3-protocol objstore
-    client: boto3.client = boto3.client(
-        "s3", # using s3 protocol
-        aws_access_key_id="fvadmin", # minio access key id
-        aws_secret_access_key="fvadmin123", # minio secret key
-        region_name="cn-hongkong", # region, useless here
-        endpoint_url="http://localhost:30900", # minio server address
-        # config=boto3.session.Config(s3={'addressing_style': 'path'}),  # using Path-Style
+    client = Minio(
+        "minio:9000", access_key="fvadmin", secret_key="fvadmin123", secure=False
     )
     cur_path = os.path.dirname(__file__)
-    # upload_file(local_file_path, bucket_name, file_name on obj)
-    client.upload_file(f"{cur_path}/data/users.csv", "flavius", "users.csv")
-    client.upload_file(f"{cur_path}/data/knows.csv", "flavius", "knows.csv")
+    client.fput_object("flavius", "users.csv", f"{cur_path}/data/users.csv")
+    client.fput_object("flavius", "knows.csv", f"{cur_path}/data/knows.csv")
 
 
-def print_database_info(driver: GraphDatabase):
+def print_database_info(driver: Client):
     for namespace in driver.list_namespace():
         for graph in driver.list_graph(namespace):
             print(f"namespace: {namespace}, graph: {graph}")
@@ -33,10 +27,10 @@ def print_database_info(driver: GraphDatabase):
 
 
 if __name__ == "__main__":
-    driver = GraphDatabase.driver("http://localhost:30000")
+    driver = GraphDatabase.driver("http://fe:30000")
     driver.verify_connectivity()
 
-    ns = "ns"
+    ns = "ns" + str(int(time.time()))
     g = "g"
 
     # create namespace and graph
@@ -47,13 +41,16 @@ if __name__ == "__main__":
     driver.create_vertex_table(
         "User",
         [
-            ("col1", DataType.INTEGER, False),  # NOT NULL
-            ("col2", DataType.STRING),
-            ("col3", DataType.BOOL),
-            ("col4", DataType.FLOAT),
-            ("col5", DataType.TIMESTAMP),
+            ("integer", DataType.INTEGER, False),  # NOT NULL
+            ("bool", DataType.BOOL),
+            ("string", DataType.STRING),
+            ("float", DataType.FLOAT),
+            ("date", DataType.DATE),
+            ("time", DataType.TIME),
+            ("datetime", DataType.DATETIME),
+            ("timestamp", DataType.TIMESTAMP),
         ],
-        "col1",  # primary key
+        "integer",  # primary key
         namespace=ns,
         graph=g,
     )
@@ -78,7 +75,8 @@ if __name__ == "__main__":
 
     # import data
     driver.execute_query(
-        'BLOCKING IMPORT VERTEX User COLUMNS("col1"=$0, "col2"=$1, "col3"=$2, "col4"=$3, "col5"=$4) '
+        "BLOCKING IMPORT VERTEX User COLUMNS"
+        '("integer"=$0, "bool"=$1, "string"=$2, "float"=$3, "date"=$4, "time"=$5, "datetime"=$6, "timestamp"=$7) '
         "FROM 'oss://flavius/users.csv' WITH (region = 'cn-hongkong', "
         "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://minio:9000') "
         "FORMAT AS CSV (has_header = false, delimiter = ',')",
@@ -86,7 +84,7 @@ if __name__ == "__main__":
         graph=g,
     )  # Returns None
     driver.execute_query(
-        'BLOCKING IMPORT EDGE knows FROM ("col1"=$1) TO ("col1"=$2) COLUMNS("col1"=$0) '
+        'BLOCKING IMPORT EDGE knows FROM ("integer"=$1) TO ("integer"=$2) COLUMNS("col1"=$0) '
         "FROM 'oss://flavius/knows.csv' WITH (region = 'cn-hongkong', "
         "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://minio:9000') "
         "FORMAT AS CSV (has_header = false, delimiter = ',')",
@@ -96,7 +94,7 @@ if __name__ == "__main__":
 
     # execute query
     records, keys = driver.execute_query(
-        "MATCH ()-[r:knows]->() RETURN r",
+        "MATCH ()-[r:knows]->() WHERE r.col1 <= 0.75 RETURN r",
         namespace=ns,
         graph=g,
     )
@@ -109,9 +107,8 @@ if __name__ == "__main__":
     ts = dateutil.parser.parse("2024-01-02 02:34:00Z")
     flavius_ts = TimeStamp(ts)
     records, keys = driver.execute_query(
-        "MATCH (n:User) WHERE n.col1 in $ids AND n.col5 > $timestamp "
-        "MATCH (n:User) WHERE n.col1 in $ids "
-        "RETURN n.__vid__, n.__label__, n.col1, n.col2, n.col3, n.col4, n.col5",
+        "MATCH (n:User) WHERE n.integer in $ids AND n.timestamp > $timestamp "
+        "RETURN n.__vid__, n.__label__, n.integer, n.bool, n.string, n.float, n.date, n.time, n.datetime, n.timestamp",
         namespace=ns,
         graph=g,
         parameters={"ids": [1, 3], "timestamp": flavius_ts},
