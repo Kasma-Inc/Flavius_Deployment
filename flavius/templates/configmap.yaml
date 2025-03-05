@@ -42,7 +42,7 @@ data:
     s3_region = "{{ .Values.common.aws_region }}"
     oss_endpoint = "{{ .Values.common.aws_endpoint }}"
 
-    ms_max_brpc_thread_num = "{{ .Values.common.ms.resources.ms_max_brpc_thread_num }}"
+    ms_max_brpc_thread_num = "{{ .Values.ms.resources.ms_max_brpc_thread_num }}"
 
     #trace_exporter_url = " {{ .Values.common.otlp_http_url }}"
     ## True do disable SSL, default false
