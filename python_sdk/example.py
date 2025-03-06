@@ -6,6 +6,9 @@ import os
 
 
 def upload_data():
+    # client = Minio(
+    #     "localhost:30900", access_key="fvadmin", secret_key="fvadmin123", secure=False
+    # )
     client = Minio(
         "minio:9000", access_key="fvadmin", secret_key="fvadmin123", secure=False
     )
@@ -27,6 +30,7 @@ def print_database_info(driver: Client):
 
 
 if __name__ == "__main__":
+    # driver = GraphDatabase.driver("http://localhost:30000")
     driver = GraphDatabase.driver("http://fe:30000")
     driver.verify_connectivity()
 
