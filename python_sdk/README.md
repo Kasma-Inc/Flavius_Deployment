@@ -692,10 +692,15 @@ MATCH (a:Person:Item) RETURN a
 
 #### Match on multiple rel types
 
-Find relationship with `rBuy` or `Knows` relationship types.
+Find relationships with `rBuy` or `Knows` relationship types.
+
+```
+MATCH (a)<-[r:rBuy|Knows]-(b) RETURN a
+```
+Find relationships are neither `rBuy` or `Knows`  relationship types.
 
 ```cypher
-MATCH (a)<-[r:rBuy|:Knows]-(b) RETURN a
+MATCH (a)<-[r:(!rBuy)&(!Knows)]-(b) RETURN a
 ```
 
 ### Insert to flavius
