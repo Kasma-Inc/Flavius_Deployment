@@ -42,6 +42,8 @@ data:
     s3_region = "{{ .Values.common.aws_region }}"
     oss_endpoint = "{{ .Values.common.aws_endpoint }}"
 
+    ms_max_brpc_thread_num = {{ .Values.ms.resources.ms_max_brpc_thread_num }}
+
     #trace_exporter_url = " {{ .Values.common.otlp_http_url }}"
     ## True do disable SSL, default false
     # trace_exporter_ssl_insecure_skip_verify = false
@@ -84,6 +86,8 @@ data:
 
     [task]
     task_cleanup_threshold_ms = {{ .Values.cn.task.task_cleanup_threshold_ms }}
+
+    cn_max_brpc_thread_num = {{ .Values.cn.resources.cn_max_brpc_thread_num }}
 
   config_gen.sh: |
     #!/usr/bin/env bash
