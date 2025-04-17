@@ -26,8 +26,19 @@ This guide walks you through deploying and interacting with the Flavius graph pl
 ## Prerequisites
 
 - **k3d**: Lightweight Kubernetes in Docker (v5.x)
-- **kubectl**: Kubernetes CLI (latest stable) ([GitHub Docs](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax?utm_source=chatgpt.com))
-- **Helm**: Kubernetes package manager (v3.x) ([GitHub Docs](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax?utm_source=chatgpt.com))
+  ```bash
+  curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+  ```
+- **kubectl**: Kubernetes CLI (latest stable)
+  ```bash
+  curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+  chmod +x kubectl
+  sudo mv kubectl /usr/local/bin/
+  ```  
+- **Helm**: Kubernetes package manager (v3.x)
+  ```bash
+  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  ```
 - **Python**: 3.10–3.12 for SDK usage
 
 ## Cluster Setup
