@@ -122,7 +122,7 @@ cd frontend/
 
 1. **Install SDK and dependencies**
    ```bash
-   pip3 install -i https://test.pypi.org/simple/ flavius_py310
+   pip3 install -i https://test.pypi.org/simple/ flavius_py310  # flavius_py311 | flavius_py312
    pip3 install minio
    ```
 
