@@ -12,7 +12,7 @@ common:
   otlp_http_url: ""
 
 fe:
-  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2a182ac
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-70763ef
   resources:
     requests:
       cpu: 0.1
@@ -23,7 +23,7 @@ fe:
 
 ms:
   replicas: 1
-  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2a182ac
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-70763ef
   resources:
     requests:
       cpu: 0.1
@@ -36,7 +36,7 @@ ms:
 
 cn:
   replicas: 1
-  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-2a182ac
+  image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-70763ef
   task:
     task_cleanup_threshold_ms: 3600000
   resources:
