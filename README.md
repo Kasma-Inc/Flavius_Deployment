@@ -79,7 +79,7 @@ helm install minio oci://registry-1.docker.io/bitnamicharts/minio \
   --set auth.rootUser=fvadmin --set auth.rootPassword=fvadmin123 \
   --set defaultBuckets=flavius \
   --set service.type=NodePort --set service.nodePorts.api=30900 \
-  --set persistence.enabled=false --wait
+  --set persistence.enabled=true --wait
 ```
 
 ### Etcd
@@ -89,7 +89,7 @@ Install single-node etcd:
 ```bash
 helm install etcd ./etcd \
   --create-namespace --namespace etcd \
-  --set auth.rbac.create=false --set persistence.enabled=false --wait
+  --set auth.rbac.create=false --set persistence.enabled=true --wait
 ```
 
 ### Flavius Image Pull Credentials
