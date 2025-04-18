@@ -129,6 +129,8 @@ cd frontend/
 ./shell --host localhost --port 30000
 ```
 
+Please check more details in the Flavius Official [Doc/shell](https://flavius-docs.kasma.ai/shell/) section. 
+
 ### Via Python SDK
 
 1. **Install SDK and dependencies**
