@@ -9,7 +9,8 @@
   - [MinIO](#minio)
   - [etcd](#etcd)
   - [Flavius Image Pull Credentials](#flavius-image-pull-credentials)
-  - [Flavius Platform](#flavius-platform)
+  - [Modify Cluster CoreDNS for K3D](#modify-cluster-coredns-for-k3d)
+  - [Install Flavius Services](#install-flavius-services)
 - [Verify Deployment](#verify-deployment)
 - [Interacting with Flavius](#interacting-with-flavius)
   - [Via FE Pod Shell](#via-fe-pod-shell)
@@ -102,9 +103,15 @@ kubectl -n flavius create secret docker-registry image-pull-secret \
   --docker-password="Kasma2025"
 ```
 
-### Flavius Platform
+### Modify Cluster CoreDNS Config for K3D
 
-Install Flavius services:
+```bash
+cd /Flavius_Deployment/tools
+kubectl -n kube-system apply -f k3d-coredns-custom.yaml
+kubectl rollout restart -n kube-system deployment/coredns
+```
+
+### Install Flavius Services
 
 ```bash
 helm install flavius ./flavius \
@@ -143,13 +150,6 @@ Please check more details in the Flavius Official [Doc/shell](https://flavius-do
    ```bash
    k3d cluster edit flavius --port-add 30000:30000@loadbalancer
    kubectl port-forward -n minio svc/minio 30900:9000
-   ```
-
-3. **Update CoreDNS for k3d**
-   ```bash
-   cd tools
-   kubectl -n kube-system apply -f k3d-coredns-custom.yaml
-   kubectl rollout restart -n kube-system deployment/coredns
    ```
 
 ## Example Python Script
