@@ -103,7 +103,7 @@ kubectl -n flavius create secret docker-registry image-pull-secret \
   --docker-password="Kasma2025"
 ```
 
-### Modify Cluster CoreDNS Config for K3D
+### Modify Cluster CoreDNS for K3D
 
 ```bash
 cd /Flavius_Deployment/tools
@@ -128,6 +128,14 @@ kubectl get pods --all-namespaces
 
 ## Interacting with Flavius
 
+Prerequisites
+- Forward port 3000 of the Flavius FE pod in your k3d cluster to your local machine.
+- Forward port 30900 of your MinIO service to your local machine.
+```bash
+ k3d cluster edit flavius --port-add 30000:30000@loadbalancer
+ kubectl port-forward -n minio svc/minio 30900:9000
+```
+
 ### Via FE Pod Shell
 
 ```bash
@@ -140,16 +148,10 @@ Please check more details in the Flavius Official [Doc/shell](https://flavius-do
 
 ### Via Python SDK
 
-1. **Install SDK and dependencies**
+**Install SDK and dependencies**
    ```bash
    pip3 install -i https://test.pypi.org/simple/ flavius_py310  # flavius_py311 | flavius_py312
    pip3 install minio
-   ```
-
-2. **Port-forward services**
-   ```bash
-   k3d cluster edit flavius --port-add 30000:30000@loadbalancer
-   kubectl port-forward -n minio svc/minio 30900:9000
    ```
 
 ## Example Python Script
