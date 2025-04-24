@@ -17,18 +17,40 @@ from .utils.utils import Record
 from ._client import ClientImpl
 from .utils.utils import DataType
 
+
 class GraphDatabase:
+    """A client for the Flavius graph database"""
+
     @staticmethod
-    def driver(uri: str, timeout: int = 120):
+    def driver(uri: str, timeout: int | None = None):
+        """Create a client instance from a URI string
+
+        :param uri: Server URI address (must start with 'http://')
+        :param timeout: When set, this timeout will be applied to all subsequent database operations，When None,
+                        operations will not timeout
+        :return: A new Client instance
+        :raises ValueError: If the URI doesn't start with 'http://'
+
+        Example::
+
+            # Create client with no timeout
+            client = GraphDatabase.driver("http://localhost:30000")
+
+            # Create client with 30 second timeout for all operations
+            client = GraphDatabase.driver("http://example.com:30000", timeout=30)
+        """
         if not uri.startswith("http://"):
             raise ValueError("Invalid URI: Only 'http://' protocol is supported")
         host, port = uri.removeprefix("http://").split(":")
         return Client(host, port, timeout)
 
+
 class Client:
     """A client for the Flavius graph database"""
 
-    def __init__(self, host: str = "localhost", port: int = 30000, timeout: int = 120):
+    def __init__(
+        self, host: str = "localhost", port: int = 30000, timeout: int | None = None
+    ):
         self._impl = ClientImpl(host, port, timeout)
 
     def verify_connectivity(self) -> None:
@@ -106,7 +128,7 @@ class Client:
                 table="Person",
                 columns=[
                     ("id", DataType.INT, False), # NOT NULL
-                    ("name", DataType.STRING, False), # NOT NULL
+                    ("name", DataType.VARCHAR, False), # NOT NULL
                     ("created_at", DataType.TIMESTAMP, False), # NOT NULL
                     ("age", DataType.INT, True), # NULLABLE
                 ],
@@ -161,7 +183,7 @@ class Client:
                 target_vertex="Person",
                 columns=[
                     ("since", DataType.DATETIME), # NULLABLE
-                    ("weight", DataType.FLOAT, False) # NOT NULL
+                    ("weight", DataType.DOUBLE, False) # NOT NULL
                 ],
                 directed=True,
                 namespace="social",
@@ -197,6 +219,7 @@ class Client:
         namespace: str,
         graph: str,
         parameters: dict = None,
+        timeout: int | None = None,
     ) -> Tuple[List[Record], List[str]] | None:
         """Execute a Cypher query against the graph database.
 
@@ -207,6 +230,8 @@ class Client:
             - Basic types: int, float, bool, str\n
             - Temporal types: datetime, date, time, TimeStamp\n
             - Complex types: list, dict\n
+        :param timeout: When set, this timeout will be applied to all subsequent database operations，When None,
+                        operations will not timeout
         :return: A tuple containing (records, keys), where:\n
             - records: List of Record objects containing the query results\n
             - keys: List of strings representing the column names
@@ -237,9 +262,9 @@ class Client:
 
             # Non-query statement
             driver.execute_query(
-                "CREATE VERTEX User (name STRING NOT NULL) PRIMARY KEY name",
+                "CREATE VERTEX User (name VARCHAR NOT NULL) PRIMARY KEY name",
                 namespace="social",
                 graph="relationships"
             )  # Returns None
         """
-        return self._impl.execute_query(query, namespace, graph, parameters)
+        return self._impl.execute_query(query, namespace, graph, parameters, timeout)

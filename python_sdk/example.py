@@ -7,11 +7,8 @@ import os
 
 def upload_data():
     client = Minio(
-        "localhost:30900", access_key="fvadmin", secret_key="fvadmin123", secure=False
-     )
-    # client = Minio(
-    #    "minio:9000", access_key="fvadmin", secret_key="fvadmin123", secure=False
-    # )
+            "localhost:30900", access_key="fvadmin", secret_key="fvadmin123", secure=False
+    )
     cur_path = os.path.dirname(__file__)
     client.fput_object("flavius", "users.csv", f"{cur_path}/data/users.csv")
     client.fput_object("flavius", "knows.csv", f"{cur_path}/data/knows.csv")
@@ -31,7 +28,6 @@ def print_database_info(driver: Client):
 
 if __name__ == "__main__":
     driver = GraphDatabase.driver("http://localhost:30000")
-    # driver = GraphDatabase.driver("http://fe:30000")
     driver.verify_connectivity()
 
     ns = "ns" + str(int(time.time()))
@@ -45,16 +41,16 @@ if __name__ == "__main__":
     driver.create_vertex_table(
         "User",
         [
-            ("integer", DataType.INTEGER, False),  # NOT NULL
+            ("bigint", DataType.BIGINT, False),  # NOT NULL
             ("bool", DataType.BOOL),
-            ("string", DataType.STRING),
-            ("float", DataType.FLOAT),
+            ("varchar", DataType.VARCHAR),
+            ("double", DataType.DOUBLE),
             ("date", DataType.DATE),
             ("time", DataType.TIME),
             ("datetime", DataType.DATETIME),
             ("timestamp", DataType.TIMESTAMP),
         ],
-        "integer",  # primary key
+        "bigint",  # primary key
         namespace=ns,
         graph=g,
     )
@@ -65,7 +61,7 @@ if __name__ == "__main__":
         source_vertex="User",
         target_vertex="User",
         columns=[
-            ("col1", DataType.FLOAT),
+            ("col1", DataType.DOUBLE),
         ],
         directed=True,
         namespace=ns,
@@ -80,7 +76,7 @@ if __name__ == "__main__":
     # import data
     driver.execute_query(
         "BLOCKING IMPORT VERTEX User COLUMNS"
-        '("integer"=$0, "bool"=$1, "string"=$2, "float"=$3, "date"=$4, "time"=$5, "datetime"=$6, "timestamp"=$7) '
+        '("bigint"=$0, "bool"=$1, "varchar"=$2, "double"=$3, "date"=$4, "time"=$5, "datetime"=$6, "timestamp"=$7) '
         "FROM 'oss://flavius/users.csv' WITH (region = 'cn-hongkong', "
         "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://minio:9000') "
         "FORMAT AS CSV (has_header = false, delimiter = ',')",
@@ -88,7 +84,7 @@ if __name__ == "__main__":
         graph=g,
     )  # Returns None
     driver.execute_query(
-        'BLOCKING IMPORT EDGE knows FROM ("integer"=$1) TO ("integer"=$2) COLUMNS("col1"=$0) '
+        'BLOCKING IMPORT EDGE knows FROM ("bigint"=$1) TO ("bigint"=$2) COLUMNS("col1"=$0) '
         "FROM 'oss://flavius/knows.csv' WITH (region = 'cn-hongkong', "
         "access_key_id = 'fvadmin', secret_access_key = 'fvadmin123', endpoint = 'http://minio:9000') "
         "FORMAT AS CSV (has_header = false, delimiter = ',')",
@@ -111,8 +107,8 @@ if __name__ == "__main__":
     ts = dateutil.parser.parse("2024-01-02 02:34:00Z")
     flavius_ts = TimeStamp(ts)
     records, keys = driver.execute_query(
-        "MATCH (n:User) WHERE n.integer in $ids AND n.timestamp > $timestamp "
-        "RETURN n.__vid__, n.__label__, n.integer, n.bool, n.string, n.float, n.date, n.time, n.datetime, n.timestamp",
+        "MATCH (n:User) WHERE n.bigint in $ids AND n.timestamp > $timestamp "
+        "RETURN n.__vid__, n.__label__, n.bigint, n.bool, n.varchar, n.double, n.date, n.time, n.datetime, n.timestamp",
         namespace=ns,
         graph=g,
         parameters={"ids": [1, 3], "timestamp": flavius_ts},
