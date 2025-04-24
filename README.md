@@ -150,7 +150,7 @@ Please check more details in the Flavius Official [Doc/shell](https://flavius-do
 
 **Install SDK and dependencies**
    ```bash
-   pip3 install -i https://test.pypi.org/simple/ flavius_py310  # flavius_py311 | flavius_py312
+   pip3 install flavius_py310  # flavius_py311 | flavius_py312
    pip3 install minio
    ```
 
@@ -165,7 +165,7 @@ See `python_sdk/example.py` for a complete demo illustrating:
 
 ## Troubleshooting
 
-- **Installation errors**: Verify network access to Docker registry and TestPyPI.
+- **Installation errors**: Verify network access to Docker registry and PyPI.
 - **Port conflicts**: Ensure ports 30000 and 30900 are free on your host.
 - **DNS issues**: Reapply CoreDNS config as shown above.
 
