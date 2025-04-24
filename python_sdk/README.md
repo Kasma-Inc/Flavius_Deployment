@@ -6,9 +6,9 @@ The **Flavius Python SDK** provides a lightweight, intuitive interface for inter
 
 ```bash
 # Choose the package matching your Python version:
-pip install -i https://test.pypi.org/simple/ flavius_py310   # Python 3.10
-pip install -i https://test.pypi.org/simple/ flavius_py311   # Python 3.11
-pip install -i https://test.pypi.org/simple/ flavius_py312   # Python 3.12
+pip install flavius_py310   # Python 3.10
+pip install flavius_py311   # Python 3.11
+pip install flavius_py312   # Python 3.12
 ```
 
 Optionally, install the MinIO client to upload CSV files:
