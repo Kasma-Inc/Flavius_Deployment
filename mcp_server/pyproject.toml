@@ -1,0 +1,45 @@
+[project]
+name = "mcp-flavius-cypher"
+version = "0.1.0"
+description = "A Model Context Protocol (MCP) server implementation for Flavius graph database"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Hongzhi CHEN", email = "chenhongzhi@kasma.ai"}
+]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "flavius==0.2.0",
+    "mcp>=0.1.0",
+    "pydantic>=2.0.0",
+    "minio>=7.2.0"
+]
+keywords = ["graph database", "Flavius", "Cypher", "MCP", "server", "model context"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Topic :: Database :: Front-Ends",
+    "Typing :: Typed"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0"
+]
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
