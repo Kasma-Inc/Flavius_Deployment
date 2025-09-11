@@ -3,14 +3,13 @@ kind: Service
 metadata:
   name: fe
 spec:
-  type: LoadBalancer
   ports:
   - port: 30000
     targetPort: 30000
-    nodePort: 30000
     protocol: TCP
   selector:
     app: fe
+  type: {{ .Values.fe.service.type }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -42,6 +41,8 @@ spec:
           sh /Flavius/config/config_gen.sh /Flavius/config/fe.toml.template /Flavius/fe.toml
           exec /Flavius/frontend/frontend -c /Flavius/fe.toml
         env:
+        - name: RUST_BACKTRACE
+          value: full
         {{- include "common.env" .| nindent 8}}
         resources:
           requests:
@@ -76,5 +77,4 @@ spec:
             path: fe.toml.template
           - key: config_gen.sh
             path: config_gen.sh
-
 

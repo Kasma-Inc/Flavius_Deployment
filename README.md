@@ -142,8 +142,10 @@ Prerequisites
 ```bash
 kubectl exec -it fe-0 -n flavius -- /bin/bash
 cd frontend/
-./shell --host localhost --port 30000
+./flavius-shell --host localhost --port 30000 --user <username> --password <password>
 ```
+
+The default username is `FVADMIN`, and password is `FVADMIN123`.
 
 Please check more details in the Flavius Official [Doc/shell](https://flavius-docs.kasma.ai/shell/) section. 
 
