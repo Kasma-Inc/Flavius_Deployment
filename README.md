@@ -23,7 +23,7 @@
 
 ## Introduction
 
-This guide walks you through deploying and interacting with the Flavius graph platform on a local k3d Kubernetes cluster. By the end, you'll have MinIO object storage, etcd, and Flavius services running, plus examples of how to query Flavius via its FE shell and Python SDK.
+This guide walks you through deploying and interacting with the Flavius graph platform on a local k3d Kubernetes cluster. By the end, you'll have MinIO object storage, etcd, and Flavius services running, plus examples of how to query Flavius via its FE shell, Python SDK and Neo4j SDK.
 
 ## Prerequisites
 
