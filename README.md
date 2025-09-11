@@ -130,10 +130,11 @@ kubectl get pods --all-namespaces
 ## Interacting with Flavius
 
 Prerequisites
-- Forward port 3000 of the Flavius FE pod in your k3d cluster to your local machine.
+- Forward port 30000 and 7687 of the Flavius FE pod in your k3d cluster to your local machine.
 - Forward port 30900 of your MinIO service to your local machine.
 ```bash
  k3d cluster edit flavius --port-add 30000:30000@loadbalancer
+ k3d cluster edit flavius --port-add 7687:7687@loadbalancer
  kubectl port-forward -n minio svc/minio 30900:9000
 ```
 
