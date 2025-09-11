@@ -14,8 +14,9 @@
 - [Verify Deployment](#verify-deployment)
 - [Interacting with Flavius](#interacting-with-flavius)
   - [Via FE Pod Shell](#via-fe-pod-shell)
-  - [Via Python SDK](#via-python-sdk)
-- [Example Python Script](#example-python-script)
+  - [Via Python SDK (No longer recommended)](#via-python-sdk-no-longer-recommended)
+    - [Example Python Script](#example-python-script)
+  - [Via Neo4j SDK (Recommended)](#via-neo4j-sdk-recommended)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 <!-- tocstop -->
@@ -146,7 +147,7 @@ cd frontend/
 
 Please check more details in the Flavius Official [Doc/shell](https://flavius-docs.kasma.ai/shell/) section. 
 
-### Via Python SDK
+### Via Python SDK (No longer recommended)
 
 **Install SDK and dependencies**
    ```bash
@@ -154,7 +155,7 @@ Please check more details in the Flavius Official [Doc/shell](https://flavius-do
    pip3 install minio
    ```
 
-## Example Python Script
+#### Example Python Script
 
 See `python_sdk/example.py` for a complete demo illustrating:
 
@@ -162,6 +163,11 @@ See `python_sdk/example.py` for a complete demo illustrating:
 - Creating namespaces, graphs, vertex and edge tables
 - Importing data with BLOCKING IMPORT
 - Executing parameterized queries
+
+### Via Neo4j SDK (Recommended)
+
+Please refer to [Flavius Docs#sdk](https://flavius-docs.kasma.ai/sdk/) for installation and usage based on the Neo4j Bolt protocol.  
+For the Example Script, also check the **“Example usage”** section in the documentation.
 
 ## Troubleshooting
 
