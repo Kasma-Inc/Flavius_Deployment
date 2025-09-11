@@ -57,8 +57,6 @@ data:
     s3_region = "{{ .Values.common.aws_region }}"
     oss_endpoint = "{{ .Values.common.aws_endpoint }}"
 
-    ms_max_brpc_thread_num = {{ .Values.ms.resources.ms_max_brpc_thread_num }}
-
     #trace_exporter_url = " {{ .Values.common.otlp_http_url }}"
     ## True do disable SSL, default false
     # trace_exporter_ssl_insecure_skip_verify = false
@@ -66,6 +64,42 @@ data:
     # trace_exporter_ssl_client_key_string = ""
     ## CLIENT CERT, as a string
     # trace_exporter_client_cert_string = ""
+
+    # The interval in milliseconds between retries to watch leader sys time.
+    watch_leader_sys_time_worker_interval_ms = {{ .Values.ms.watch_leader_sys_time_worker_interval_ms }}
+    # The interval in milliseconds between retries to update leader sys time.
+    update_leader_sys_time_worker_interval_ms = {{ .Values.ms.update_leader_sys_time_worker_interval_ms }}
+
+    # the default compaction switch
+    enable_compaction = {{ .Values.ms.compaction.enable_compaction }}
+    # the default value for active snapshot max count to compaction
+    active_snapshot_threshold_for_compaction = {{ .Values.ms.compaction.active_snapshot_threshold_for_compaction }}
+
+    # Clean single job metadata after job finished.
+    ms_clean_single_job_metadata = {{ .Values.ms.ms_clean_single_job_metadata }}
+    # Enable graph version truncate worker.
+    enable_graph_version_truncate_worker = {{ .Values.ms.enable_graph_version_truncate_worker }}
+    # The max number of graph versions to store.
+    max_store_graph_version = {{ .Values.ms.max_store_graph_version }}
+    # Load catalog data after recover.
+    ms_load_catalog_data_after_recover = {{ .Values.ms.ms_load_catalog_data_after_recover }}
+
+    ## resource
+    query_resource_group_default_memory_limit_bytes = {{ include "flavius.toBytes" .Values.cn.resources.limits.memory }}
+    query_resource_group_default_cpu_core_limit = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    query_resource_group_default_io_core_limit = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    query_resource_group_default_concurrency_limit = {{ .Values.ms.resources.query_resource_group_default_concurrency_limit }}
+    query_resource_group_default_cpu_used_permille_limit = {{ include "flavius.toBytes" .Values.cn.resources.limits.memory }}
+    query_resource_group_default_memory_percent_limit = {{ .Values.ms.resources.query_resource_group_default_memory_percent_limit }}
+    query_resource_group_default_enable_queue = {{ .Values.ms.resources.query_resource_group_default_enable_queue }}
+    query_resource_group_default_queue_concurrency_limit = {{ .Values.ms.resources.query_resource_group_default_queue_concurrency_limit }}
+    import_resource_group_default_memory_limit_bytes = {{ include "flavius.toBytes" .Values.cn.resources.limits.memory }}
+    import_resource_group_default_cpu_core_limit = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    import_resource_group_default_io_core_limit = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    import_resource_group_default_concurrency_limit = {{ .Values.ms.resources.import_resource_group_default_concurrency_limit }}
+    import_resource_group_default_enable_queue = {{ .Values.ms.resources.import_resource_group_default_enable_queue }}
+    import_resource_group_default_queue_timeout_second = {{ .Values.ms.resources.import_resource_group_default_queue_timeout_second }}
+    ms_max_brpc_thread_num = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
 
   cn.toml.template: |
     server_ip = "POD_IP"
@@ -91,18 +125,36 @@ data:
     # trace_exporter_client_cert_string = ""
 
     [resource]
-    max_query_cpu_threads =  {{ .Values.cn.resources.max_query_cpu_threads }}
-    max_system_cpu_threads =  {{ .Values.cn.resources.max_system_cpu_threads }}
-    max_io_threads = {{ .Values.cn.resources.max_io_threads }}
-    max_memory_pool_bytes = {{ .Values.cn.resources.max_memory_pool_bytes }}
+    max_system_cpu_threads = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    max_system_io_threads = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    max_brpc_thread_num = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    max_memory_pool_bytes = {{ include "flavius.calcMaxMemoryPool" .Values.cn.resources.limits.memory }}
     data_cache_enabled = {{ .Values.cn.resources.data_cache_enabled }}
     ssd_cache_max_mb = {{ .Values.cn.resources.ssd_cache_max_mb }}
-    ssd_cache_num_shards = {{ .Values.cn.resources.ssd_cache_num_shards }}
+    ssd_cache_num_shards = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
+    ssd_cache_file_prefix = {{ .Values.cn.resources.ssd_cache_file_prefix }}
+    row_group_lru_cache_size = {{ .Values.cn.resources.row_group_lru_cache_size }}
+    max_vertex_id_index_cache_size = {{ .Values.cn.resources.max_vertex_id_index_cache_size }}
+    max_vertex_row_index_cache_size = {{ .Values.cn.resources.max_vertex_row_index_cache_size }}
+    max_edge_row_index_cache_size = {{ .Values.cn.resources.max_edge_row_index_cache_size }}
+    max_single_edge_index_cache_size = {{ .Values.cn.resources.max_single_edge_index_cache_size }}
 
     [task]
     task_cleanup_threshold_ms = {{ .Values.cn.task.task_cleanup_threshold_ms }}
 
-    cn_max_brpc_thread_num = {{ .Values.cn.resources.cn_max_brpc_thread_num }}
+    [query]
+    # The max size (in bytes) of local exchange buffers in a query. 2MB per thread. Default 32MB.
+    max_local_exchange_buffer_size = {{ mul (include "flavius.toCores" .Values.cn.resources.limits.cpu | int) 1024 1024 2 }}
+    # The max size (in bytes) of merge exchange buffers in a query. Default 128MB.
+    merge_exchange.max_buffer_size = {{ .Values.cn.query.merge_exchange_max_buffer_size }}
+    # The max size (in bytes) of partitioned output buffers (before data serialization) in a query. Default 32MB. Increasing this value may improve network throughput for data transferred between stages in case of high network latency or large clusters.
+    max_page_partitioning_buffer_size = {{ mul (include "flavius.toCores" .Values.cn.resources.limits.cpu | int) 1024 1024 2 }}
+    # The preferred number of rows in a batch produced by operators. The actual batch size might be different. Default 4096.
+    preferred_output_batch_rows = {{ .Values.cn.query.preferred_output_batch_rows }}
+    # The max number of rows in a batch produced by operators. Default 10,000.
+    max_output_batch_rows = {{ .Values.cn.query.max_output_batch_rows }}
+    # The number of parallel table writer threads per task. Used when insert into object store now.
+    task_writer_count = {{ $val := div (include "flavius.toCores" .Values.cn.resources.limits.cpu | int) 4 }}{{ if lt $val 1 }}1{{ else }}{{ $val }}{{ end }}
 
   config_gen.sh: |
     #!/usr/bin/env bash
