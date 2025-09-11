@@ -1,8 +1,6 @@
 common:
   etcd_endpoints:
   - etcd-0.etcd-headless.etcd.svc.cluster.local:2379
-  - etcd-1.etcd-headless.etcd.svc.cluster.local:2379
-  - etcd-2.etcd-headless.etcd.svc.cluster.local:2379
   catalog_name: test
   # use minio
   root_dir: oss://flavius/test
