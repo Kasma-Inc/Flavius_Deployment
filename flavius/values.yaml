@@ -1,6 +1,6 @@
 common:
   etcd_endpoints:
-  - etcd-0.etcd-headless.etcd.svc.cluster.local:2379
+    - etcd-0.etcd-headless.etcd.svc.cluster.local:2379
   catalog_name: test
   # use minio
   root_dir: oss://flavius/test
@@ -16,11 +16,11 @@ fe:
   image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-525d196
   resources:
     requests:
-      cpu: 0.1
-      memory: 2Gi
+      cpu: "0.1"
+      memory: "2Gi"
     limits:
-      cpu: 8
-      memory: 8Gi
+      cpu: "8"
+      memory: "8Gi"
   service:
     type: LoadBalancer
 
@@ -29,34 +29,74 @@ ms:
   image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-525d196
   resources:
     requests:
-      cpu: 0.1
-      memory: 2Gi
+      cpu: "0.1"
+      memory: "2Gi"
     limits:
-      cpu: 2
-      memory: 8Gi
-    ms_max_brpc_thread_num: 32
-
+      cpu: "2"
+      memory: "8Gi"
+    query_resource_group_default_concurrency_limit: "1000001"
+    query_resource_group_default_cpu_used_permille_limit: "990"
+    query_resource_group_default_memory_percent_limit: "80"
+    query_resource_group_default_enable_queue: true
+    query_resource_group_default_queue_concurrency_limit: "1000000"
+    import_resource_group_default_concurrency_limit: "1000001"
+    import_resource_group_default_enable_queue: true
+    import_resource_group_default_queue_timeout_second: "3600"
+  compaction:
+    enable_compaction: true
+    active_snapshot_threshold_for_compaction: "10"
+  # The interval in milliseconds between retries to watch leader sys time.
+  watch_leader_sys_time_worker_interval_ms: "86403000"
+  # The interval in milliseconds between retries to update leader sys time.
+  update_leader_sys_time_worker_interval_ms: "86400000"
+  # Clean single job metadata after job finished.
+  ms_clean_single_job_metadata: true
+  # Enable graph version truncate worker.
+  enable_graph_version_truncate_worker: true
+  # The max number of graph versions to store.
+  max_store_graph_version: "5"
+  # Load catalog data after recover.
+  ms_load_catalog_data_after_recover: true
 
 cn:
   replicas: 1
   image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-525d196
   task:
-    task_cleanup_threshold_ms: 3600000
+    task_cleanup_threshold_ms: "3600000"
   resources:
     requests:
-      cpu: 0.1
-      memory: 2Gi
+      cpu: "0.1"
+      memory: "2Gi"
     limits:
-      cpu: 2
-      memory: 8Gi
-    max_query_cpu_threads: 16
-    max_system_cpu_threads: 4
-    max_io_threads: 16
-    # 6GB for query execution memory pool
-    max_memory_pool_bytes: 6442450944
+      cpu: "2"
+      memory: "80Gi"
     data_cache_enabled: true
-    # ssd_cache_max_mb should be adjusted according to the disk capacity & dataset size
-    ssd_cache_max_mb: 1024
-    # ssd_cache_num_shards should be adjusted according to the cpu resource availability
-    ssd_cache_num_shards: 1
-    cn_max_brpc_thread_num: 128
+    # ssd_cache_max_mb should be adjusted according to the disk capacity & dataset size. 0 means disable ssd cache.
+    ssd_cache_max_mb: "0"
+    # SSD Cache file prefix. Effectively only the data_cache_enabled is true and ssd_cache_max_mb > 0.
+    ssd_cache_file_prefix: "/tmp/flavius/cache"
+    # Maximum number of entries in vertex ID index cache. A larger cache can improve query performance by keeping
+    # more vertex ID indices in memory, but at the cost of additional memory usage.
+    max_vertex_id_index_cache_size: "256"
+    # Maximum number of entries in vertex row index cache. A larger cache can improve query performance by keeping
+    # more vertex row indices in memory, but at the cost of additional memory usage.
+    max_vertex_row_index_cache_size: "256"
+    # Maximum number of entries in edge row index cache. A larger cache can improve query performance by keeping
+    # more edge row indices in memory, but at the cost of additional memory usage.
+    max_edge_row_index_cache_size: "512"
+    # Maximum number of entries in single edge index cache. A larger cache can improve query performance by keeping
+    # more single edge indices in memory, but at the cost of additional memory usage.
+    max_single_edge_index_cache_size: "512"
+    # Maximum number of entries in row group cache. A larger cache can improve query performance but at the cost of
+    # additional memory usage.
+    row_group_lru_cache_size: "128"
+  rpc:
+    socket_max_streams_unconsumed_bytes: "67108864"
+    socket_max_unwritten_bytes: "134217728"
+  query:
+    # The max size (in bytes) of merge exchange buffers in a query. Default 128MB.
+    merge_exchange_max_buffer_size: "134217728"
+    # A good range is 4096-32768. But larger batch size means more memory usage.
+    preferred_output_batch_rows: "4096"
+    # A good range is 4096-32768. But larger batch size means more memory usage.
+    max_output_batch_rows: "8192"

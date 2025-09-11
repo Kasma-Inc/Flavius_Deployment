@@ -27,7 +27,9 @@ spec:
         args:
         - |
           sh /Flavius/config/config_gen.sh /Flavius/config/cn.toml.template /Flavius/cn.toml
-          exec /Flavius/FlaviusCN -config=/Flavius/cn.toml -logtostderr
+          exec /Flavius/FlaviusCN -config=/Flavius/cn.toml -logtostderr \
+            -socket_max_streams_unconsumed_bytes={{ .Values.cn.rpc.socket_max_streams_unconsumed_bytes }} \
+            -socket_max_unwritten_bytes={{ .Values.cn.rpc.socket_max_unwritten_bytes }}
         env:
         {{- include "common.env" .| nindent 8}}
         resources:
