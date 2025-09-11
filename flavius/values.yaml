@@ -69,7 +69,7 @@ cn:
       memory: "2Gi"
     limits:
       cpu: "2"
-      memory: "80Gi"
+      memory: "8Gi"
     data_cache_enabled: true
     # ssd_cache_max_mb should be adjusted according to the disk capacity & dataset size. 0 means disable ssd cache.
     ssd_cache_max_mb: "0"
