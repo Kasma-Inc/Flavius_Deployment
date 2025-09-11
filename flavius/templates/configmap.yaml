@@ -7,9 +7,24 @@ data:
     [deploy_mode]
     deploy_mode = "Cluster"
 
+    [auth_config]
+    # enable user authentication
+    enable = true
+
     [http_service_config]
     host = "0.0.0.0"
     port = 30000
+
+    [grpc_service_config]
+    enable = false
+    host = "0.0.0.0"
+    port = 40000
+
+    [bolt_service_config]
+    enable = false
+    host = "0.0.0.0"
+    port = 7687
+    recv_timeout = 60
 
     [meta_config.etcd_client]
     etcd_endpoints = "{{ .Values.common.etcd_endpoints | join "," }}"

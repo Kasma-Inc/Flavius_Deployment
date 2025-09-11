@@ -19,4 +19,8 @@
   value: {{ .Values.common.aws_endpoint }}
 - name: OTLP_HTTP_URL
   value: {{ .Values.common.otlp_http_url }}
+- name: FLAVIUS_ADMIN_NAME
+  value: {{ .Values.common.flavius_admin_name }}
+- name: FLAVIUS_ADMIN_PASSWORD
+  value: {{ .Values.common.flavius_admin_password }}
 {{- end -}}

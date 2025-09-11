@@ -10,6 +10,8 @@ common:
   aws_secret_access_key: fvadmin123
   aws_endpoint: http://minio:9000
   otlp_http_url: ""
+  flavius_admin_name: fvadmin
+  flavius_admin_password: fvadmin123
 
 fe:
   image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-525d196
@@ -18,8 +20,10 @@ fe:
       cpu: 0.1
       memory: 2Gi
     limits:
-      cpu: 2
+      cpu: 8
       memory: 8Gi
+  service:
+    type: LoadBalancer
 
 ms:
   replicas: 1
