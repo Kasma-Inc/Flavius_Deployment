@@ -7,9 +7,11 @@ spec:
   - port: 30000
     targetPort: 30000
     protocol: TCP
+    name: http
   - port: 7687
     targetPort: 7687
     protocol: TCP
+    name: bolt
   selector:
     app: fe
   type: {{ .Values.fe.service.type }}
