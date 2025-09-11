@@ -7,6 +7,9 @@ spec:
   - port: 30000
     targetPort: 30000
     protocol: TCP
+  - port: 7687
+    targetPort: 7687
+    protocol: TCP
   selector:
     app: fe
   type: {{ .Values.fe.service.type }}
