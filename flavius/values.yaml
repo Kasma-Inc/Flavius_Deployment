@@ -12,6 +12,7 @@ common:
   flavius_admin_password: fvadmin123
 
 fe:
+  replicas: 1
   image: registry-intl.cn-hongkong.aliyuncs.com/flavius/flavius:HEAD-525d196
   resources:
     requests:
