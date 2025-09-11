@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: fe
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
 spec:
   ports:
   - port: 30000
@@ -22,7 +24,7 @@ metadata:
   name: fe
 spec:
   serviceName: fe
-  replicas: 1
+  replicas: {{ .Values.fe.replicas }}
   selector:
     matchLabels:
       app: fe
@@ -40,11 +42,12 @@ spec:
         imagePullPolicy: Always 
         ports:
         - containerPort: 30000
+        - containerPort: 7687
         command: ["/bin/bash", "-c"]
         args:
         - |
           sh /Flavius/config/config_gen.sh /Flavius/config/fe.toml.template /Flavius/fe.toml
-          exec /Flavius/frontend/frontend -c /Flavius/fe.toml
+          exec /Flavius/frontend/frontend -c /Flavius/fe.toml 2> >(tee -a panic.log >&2)
         env:
         - name: RUST_BACKTRACE
           value: full
