@@ -1,24 +1,25 @@
 # Flavius Deployment Guide
 
 <!-- toc -->
-- [Introduction](#introduction)
-- [Prerequisites](#prerequisites)
-- [Cluster Setup](#cluster-setup)
-- [GitOps Repository](#gitops-repository)
-- [Service Installation](#service-installation)
-  - [MinIO](#minio)
-  - [etcd](#etcd)
-  - [Flavius Image Pull Credentials](#flavius-image-pull-credentials)
-  - [Modify Cluster CoreDNS for K3D](#modify-cluster-coredns-for-k3d)
-  - [Install Flavius Services](#install-flavius-services)
-- [Verify Deployment](#verify-deployment)
-- [Interacting with Flavius](#interacting-with-flavius)
-  - [Via FE Pod Shell](#via-fe-pod-shell)
-  - [Via Python SDK (No longer recommended)](#via-python-sdk-no-longer-recommended)
-    - [Example Python Script](#example-python-script)
-  - [Via Neo4j SDK (Recommended)](#via-neo4j-sdk-recommended)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
+- [Flavius Deployment Guide](#flavius-deployment-guide)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Cluster Setup](#cluster-setup)
+  - [GitOps Repository](#gitops-repository)
+  - [Service Installation](#service-installation)
+    - [MinIO](#minio)
+    - [Etcd](#etcd)
+    - [Flavius Image Pull Credentials](#flavius-image-pull-credentials)
+    - [Modify Cluster CoreDNS for K3D](#modify-cluster-coredns-for-k3d)
+    - [Install Flavius Services](#install-flavius-services)
+  - [Verify Deployment](#verify-deployment)
+  - [Interacting with Flavius](#interacting-with-flavius)
+    - [Via FE Pod Shell](#via-fe-pod-shell)
+    - [Via Python SDK (No longer recommended)](#via-python-sdk-no-longer-recommended)
+      - [Example Python Script](#example-python-script)
+    - [Via Neo4j SDK (Recommended)](#via-neo4j-sdk-recommended)
+  - [Troubleshooting](#troubleshooting)
+  - [License](#license)
 <!-- tocstop -->
 
 ## Introduction
@@ -108,7 +109,8 @@ kubectl -n flavius create secret docker-registry image-pull-secret \
 ### Modify Cluster CoreDNS for K3D
 
 ```bash
-cd /Flavius_Deployment/tools
+# Make sure you are in the `Flavius_Deployment/tools` directory.
+cd ./tools
 kubectl -n kube-system apply -f k3d-coredns-custom.yaml
 kubectl rollout restart -n kube-system deployment/coredns
 ```
@@ -116,6 +118,8 @@ kubectl rollout restart -n kube-system deployment/coredns
 ### Install Flavius Services
 
 ```bash
+# Make sure you are in the `Flavius_Deployment` directory.
+cd ..
 helm install flavius ./flavius \
   --namespace flavius -f ./flavius/values.yaml --wait
 ```
