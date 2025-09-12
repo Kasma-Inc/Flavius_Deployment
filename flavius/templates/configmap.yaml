@@ -132,7 +132,7 @@ data:
     data_cache_enabled = {{ .Values.cn.resources.data_cache_enabled }}
     ssd_cache_max_mb = {{ .Values.cn.resources.ssd_cache_max_mb }}
     ssd_cache_num_shards = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
-    ssd_cache_file_prefix = {{ .Values.cn.resources.ssd_cache_file_prefix }}
+    ssd_cache_file_prefix = {{ .Values.cn.resources.ssd_cache_file_prefix | quote }}
     row_group_lru_cache_size = {{ .Values.cn.resources.row_group_lru_cache_size }}
     max_vertex_id_index_cache_size = {{ .Values.cn.resources.max_vertex_id_index_cache_size }}
     max_vertex_row_index_cache_size = {{ .Values.cn.resources.max_vertex_row_index_cache_size }}
