@@ -89,7 +89,7 @@ data:
     query_resource_group_default_cpu_core_limit = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
     query_resource_group_default_io_core_limit = {{ include "flavius.toCores" .Values.cn.resources.limits.cpu }}
     query_resource_group_default_concurrency_limit = {{ .Values.ms.resources.query_resource_group_default_concurrency_limit }}
-    query_resource_group_default_cpu_used_permille_limit = {{ include "flavius.toBytes" .Values.cn.resources.limits.memory }}
+    query_resource_group_default_cpu_used_permille_limit = {{ .Values.ms.resources.query_resource_group_default_cpu_used_permille_limit }}
     query_resource_group_default_memory_percent_limit = {{ .Values.ms.resources.query_resource_group_default_memory_percent_limit }}
     query_resource_group_default_enable_queue = {{ .Values.ms.resources.query_resource_group_default_enable_queue }}
     query_resource_group_default_queue_concurrency_limit = {{ .Values.ms.resources.query_resource_group_default_queue_concurrency_limit }}
