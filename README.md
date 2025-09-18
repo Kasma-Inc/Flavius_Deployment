@@ -80,9 +80,9 @@ Install MinIO via Helm:
 helm install minio oci://registry-1.docker.io/bitnamicharts/minio \
   --create-namespace --namespace minio \
   --set auth.rootUser=fvadmin --set auth.rootPassword=fvadmin123 \
-  --set defaultBuckets=flavius \
-  --set service.type=NodePort --set service.nodePorts.api=30900 \
   --set extraEnvVars[0].name=MINIO_DOMAIN --set extraEnvVars[0].value=minio \
+  --set defaultBuckets=flavius \
+  --set image.repository=bitnamilegacy/minio \
   --set persistence.enabled=true --wait
 ```
 
